@@ -1,14 +1,19 @@
 package router
 
 import (
-	"backend/internal/handler"
+	"backend/internal/controller"
 
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter() *gin.Engine {
+func SetupRouter() *gin.Engine {
 	r := gin.Default()
-	r.GET("/getNetMusicList", handler.GetNetMusicList)
-	r.POST("/saveMusic", handler.SaveMusic)
+
+	music := r.Group("/music")
+	{
+		music.GET("/getNetMusicList", controller.GetNetMusicList)
+		music.POST("/saveMusic", controller.SaveMusic)
+	}
+
 	return r
 }

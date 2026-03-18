@@ -20,15 +20,9 @@ func main() {
 	}
 
 	db.InitDB()
-	r := router.NewRouter()
+	r := router.SetupRouter()
 
-	port := os.Getenv("SERVICE_PORT")
-
-	if port == "" {
-		port = ":8080"
-	} else if port[0] != ':' {
-		port = ":" + port
-	}
+	port := os.Getenv("PORT")
 
 	if err := r.Run(port); err != nil {
 		log.Fatalf("❌ 服务启动崩溃: %v", err)
