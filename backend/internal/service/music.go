@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"sync"
@@ -71,8 +72,14 @@ func SaveMusicLogic(songID int) (*model.Music, error) {
 
 	song := res1.Songs[0]
 	remoteUrl := res3.Data[0].URL
+	fileExt := path.Ext(remoteUrl)
+	if strings.Contains(fileExt, "?") {
+		fileExt = strings.Split(fileExt, "?")[0]
+	}
 
-	localFileName := fmt.Sprintf("%d.mp3", songID)
+	fmt.Printf(fileExt)
+
+	localFileName := fmt.Sprintf("%d%s", songID, fileExt)
 	localPath := os.Getenv("SAVE_MUSIC_DIR") + "/" + localFileName
 	if err := utils.DownloadToFile(remoteUrl, localPath); err != nil {
 		return nil, fmt.Errorf("下载文件失败: %v", err)
