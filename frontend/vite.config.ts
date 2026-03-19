@@ -24,7 +24,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         // target: 'http://127.0.0.1:3002',
-        target: 'https://music.moonc.love/api',
+        target: 'http://musichubapi.moonc.love',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       },

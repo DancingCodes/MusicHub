@@ -12,7 +12,7 @@
                             style="animation-duration: 20s" :style="{
                                 animationPlayState: isPlaying ? 'running' : 'paused',
                             }">
-                            <img :src="currentMusic.picUrl" class="w-100% h-100% rounded-full" />
+                            <img :src="currentMusic.pic_url" class="w-100% h-100% rounded-full" />
                         </div>
                         <img src="https://filestore.moonc.love/uploadFiles/1752216426296-916133906.png" alt=""
                             class="h-1.1rem absolute top-0 right-0 transform-translate-[76%,-20%] transform-origin-top-right transition-500"
@@ -24,7 +24,7 @@
                             {{ currentMusic.name }}
                         </div>
                         <div class="text-0.16rem max-sm:text-0.5rem">
-                            {{currentMusic.artists.map(i => i.name).join(' - ')}}
+                            {{ currentMusic.artists }}
                         </div>
                     </div>
                 </div>
@@ -146,8 +146,7 @@
                     :class="{ 'color-#ff0000 font-bold': currentMusic?.id === i.id }">
                     <div class="overflow-hidden whitespace-nowrap text-ellipsis flex-1">{{ i.name }}</div>
                     <div class="overflow-hidden whitespace-nowrap text-ellipsis w-1rem text-right max-sm:w-2rem">
-                        {{i.artists.map(i =>
-                            i.name).join(' - ')}}</div>
+                        {{ i.artists }}</div>
                 </div>
 
                 <div v-if="loading" class="text-center text-0.13rem max-sm:text-0.6rem">
@@ -161,7 +160,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { addMusic, getMusicList, getWyMusicList, type IMusic } from './api/music';
+import { saveMusic, getMusicList, getNetMusicList, type IMusic } from './api/music';
 import { useCursorAutoHide } from './hooks/useCursorAutoHide';
 import { useHideOnIdle } from './hooks/useHideOnIdle';
 import { usePlayer } from './hooks/usePlayer';
@@ -208,8 +207,12 @@ watch(isEnded, val => {
 const musicListRef = ref()
 const musicRowRefs = ref<HTMLElement[]>([])
 const getList = async () => {
+    if (isSerachWy.value && !queryParams.name.trim()) {
+        return
+    }
+
     loading.value = true
-    const api = isSerachWy.value ? getWyMusicList : getMusicList
+    const api = isSerachWy.value ? getNetMusicList : getMusicList
     const res = await api(queryParams)
     musicList.value.push(...res.data.list)
     total.value = res.data.total
@@ -248,7 +251,7 @@ const playBlurAnimation = ref(false)
 const playMusic = async (music: IMusic) => {
     playBlurAnimation.value = false
     if (isSerachWy.value) {
-        const res = await addMusic({
+        const res = await saveMusic({
             id: music.id
         })
         music = res.data

@@ -4,23 +4,23 @@ import request from "@/utils/request";
 export interface IMusic {
     id: number,
     name: string,
-    picUrl: string,
-    artists: { id: number; name: string }[],
+    url: string,
+    pic_url: string,
+    artists: string,
     duration: number,
     lyric: string,
-    url: string,
 }
 
 export interface IGetMusicListParams extends IPageParams {
     name: string
 }
 
-export const getMusicList = (params?: IGetMusicListParams) => request.get<IPageResponse<IMusic>>('/music', { params })
-export const getWyMusicList = (params?: IGetMusicListParams) => request.get<IPageResponse<IMusic>>('/music/wyList', { params })
+export const getMusicList = (params?: IGetMusicListParams) => request.get<IPageResponse<IMusic>>('/music/getMusicList', { params })
+export const getNetMusicList = (params?: IGetMusicListParams) => request.get<IPageResponse<IMusic>>('/music/getNetMusicList', { params })
 
-export interface IAddMusicParams {
+export interface ISaveMusicParams {
     id: number
 }
-export const addMusic = (data: IAddMusicParams) => request.post('/music', data)
+export const saveMusic = (data: ISaveMusicParams) => request.post('/music/saveMusic', data)
 
 
