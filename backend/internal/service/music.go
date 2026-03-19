@@ -89,7 +89,7 @@ func SaveMusicLogic(songID int) (*model.Music, error) {
 		Name:     song.Name,
 		Url:      os.Getenv("MUSIC_BASE_URL") + localFileName,
 		PicUrl:   song.Al.PicURL,
-		Artists:  strings.Join(artists, ", "),
+		Artists:  strings.Join(artists, ","),
 		Duration: song.Dt,
 		Lyric:    res2.Lrc.Lyric,
 	}
@@ -99,4 +99,18 @@ func SaveMusicLogic(songID int) (*model.Music, error) {
 	}
 
 	return &newMusic, nil
+}
+
+func GetMusicListLogic(pageNo, pageSize int) ([]model.Music, int64, error) {
+	var musicList []model.Music
+	var total int64
+
+	if err := db.DB.Model(&model.Music{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (pageNo - 1) * pageSize
+	err := db.DB.Offset(offset).Limit(pageSize).Order("id desc").Find(&musicList).Error
+
+	return musicList, total, err
 }

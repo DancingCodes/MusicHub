@@ -13,6 +13,7 @@ func SetupRouter() *gin.Engine {
 	{
 		music.GET("/getNetMusicList", controller.GetNetMusicList)
 		music.POST("/saveMusic", controller.SaveMusic)
+		music.GET("/getMusicList", controller.GetMusicList)
 	}
 
 	return r

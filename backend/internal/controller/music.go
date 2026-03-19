@@ -45,3 +45,19 @@ func SaveMusic(c *gin.Context) {
 
 	utils.Success(c, music)
 }
+
+func GetMusicList(c *gin.Context) {
+	pageNo, _ := strconv.Atoi(c.DefaultQuery("pageNo", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+
+	list, total, err := service.GetMusicListLogic(pageNo, pageSize)
+	if err != nil {
+		utils.Error(c, "获取列表失败: "+err.Error())
+		return
+	}
+
+	utils.Success(c, gin.H{
+		"list":  list,
+		"total": total,
+	})
+}
