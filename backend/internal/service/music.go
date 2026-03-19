@@ -77,7 +77,8 @@ func SaveMusicLogic(songID int) (*model.Music, error) {
 		fileExt = strings.Split(fileExt, "?")[0]
 	}
 
-	fmt.Printf(fileExt)
+	fmt.Printf(remoteUrl)
+	fmt.Printf("\n--- DEBUG START ---\nExtension: %s\n--- DEBUG END ---\n", fileExt)
 
 	localFileName := fmt.Sprintf("%d%s", songID, fileExt)
 	localPath := os.Getenv("SAVE_MUSIC_DIR") + "/" + localFileName
