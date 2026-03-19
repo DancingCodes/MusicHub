@@ -14,9 +14,10 @@ func main() {
 		log.Println("未找到 .env 文件，将使用系统环境变量")
 	}
 
-	err := os.MkdirAll("./saveMusics", 0755)
+	saveMusicPath := os.Getenv("SAVE_MUSIC_DIR")
+	err := os.MkdirAll(saveMusicPath, 0755)
 	if err != nil {
-		log.Fatalf("无法创建保存音乐目录: %v", err)
+		log.Fatalf("无法创建上传目录 [%s]: %v", saveMusicPath, err)
 	}
 
 	db.InitDB()

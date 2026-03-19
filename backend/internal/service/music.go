@@ -62,10 +62,6 @@ func SaveMusicLogic(songID int) (*model.Music, error) {
 
 	wg.Wait()
 
-	fmt.Printf("--- 歌曲详情 res1 --- \n%+v\n", res1)
-	fmt.Printf("--- 歌词信息 res2 --- \n%+v\n", res2)
-	fmt.Printf("--- 播放链接 res3 --- \n%+v\n", res3)
-
 	if err1 != nil || len(res1.Songs) == 0 {
 		return nil, fmt.Errorf("获取详情失败: %v", err1)
 	}
@@ -77,12 +73,11 @@ func SaveMusicLogic(songID int) (*model.Music, error) {
 	remoteUrl := res3.Data[0].URL
 
 	localFileName := fmt.Sprintf("%d.mp3", songID)
-	localPath := "./saveMusics/" + localFileName
-	if err := utils.DownloadToFile(remoteUrl, nil, localPath); err != nil {
+	localPath := os.Getenv("SAVE_MUSIC_DIR") + "/" + localFileName
+	if err := utils.DownloadToFile(remoteUrl, localPath); err != nil {
 		return nil, fmt.Errorf("下载文件失败: %v", err)
 	}
 
-	// 4. 处理歌手名称（对象数组转字符串）
 	var artists []string
 	for _, ar := range song.Ar {
 		artists = append(artists, ar.Name)
@@ -92,7 +87,7 @@ func SaveMusicLogic(songID int) (*model.Music, error) {
 	newMusic := model.Music{
 		ID:       uint(song.ID),
 		Name:     song.Name,
-		Url:      localPath,
+		Url:      os.Getenv("MUSIC_BASE_URL") + localFileName,
 		PicUrl:   song.Al.PicURL,
 		Artists:  strings.Join(artists, ", "),
 		Duration: song.Dt,
