@@ -13,7 +13,7 @@ import (
 	"sync"
 )
 
-func SearchNetease(name string, pageNo, pageSize int) (any, error) {
+func SearchNetease(name string, pageNo, pageSize int) ([]model.Music, int64, error) {
 	params := url.Values{}
 	params.Set("s", name)
 	params.Set("type", "1")
@@ -21,7 +21,43 @@ func SearchNetease(name string, pageNo, pageSize int) (any, error) {
 	params.Set("limit", strconv.Itoa(pageSize))
 
 	apiUrl := "https://music.163.com/api/search/get/web?" + params.Encode()
-	return utils.GetJSON[any](apiUrl, nil)
+
+	type rawSong struct {
+		ID      uint   `json:"id"`
+		Name    string `json:"name"`
+		Artists []struct {
+			Name string `json:"name"`
+		} `json:"artists"`
+	}
+	type NeteaseRawResponse struct {
+		Result struct {
+			Songs     []rawSong `json:"songs"`
+			SongCount int64     `json:"songCount"`
+		} `json:"result"`
+	}
+	raw, err := utils.GetJSON[NeteaseRawResponse](apiUrl, nil)
+	if err != nil {
+		return nil, 0, err
+	}
+	var musicList []model.Music
+	for _, rs := range raw.Result.Songs {
+		var artistNames []string
+		for _, a := range rs.Artists {
+			artistNames = append(artistNames, a.Name)
+		}
+
+		musicList = append(musicList, model.Music{
+			ID:      rs.ID,
+			Name:    rs.Name,
+			Artists: strings.Join(artistNames, ","),
+		})
+	}
+
+	if musicList == nil {
+		musicList = []model.Music{}
+	}
+
+	return musicList, raw.Result.SongCount, nil
 }
 
 func SaveMusicLogic(songID int) (*model.Music, error) {
